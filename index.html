@@ -1,0 +1,804 @@
+
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#120E28">
+<title>Vše nejlepší k narozeninám❤️</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Parisienne&family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root{
+  --bg-deep:#100c26;
+  --bg-deep-2:#1c1547;
+  --panel:#231a4d;
+  --panel-2:#2b2159;
+  --gold:#e8c77e;
+  --gold-dim:#a68f56;
+  --rose:#e2879a;
+  --wine:#a8395a;
+  --wine-dark:#7a2745;
+  --cream:#f7f0e4;
+  --ink:#efe8f7;
+  --muted:#a196c4;
+  --shadow-soft: 0 20px 60px rgba(0,0,0,.45);
+}
+
+*{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+html,body{height:100%;}
+body{
+  margin:0;
+  background: radial-gradient(120% 100% at 50% 0%, #201a4c 0%, #0c0920 70%);
+  font-family:'Poppins', sans-serif;
+  color:var(--ink);
+  display:flex;
+  justify-content:center;
+  min-height:100dvh;
+  overflow-x:hidden;
+}
+
+/* === phone frame (only visually "frames" on wide/desktop viewports; fills naturally on real phones) === */
+.phone-frame{
+  position:relative;
+  width:100%;
+  max-width:430px;
+  min-height:100dvh;
+  background: var(--bg-deep);
+  overflow:hidden;
+  isolation:isolate;
+}
+@media (min-width:520px){
+  body{ padding: 28px 0; }
+  .phone-frame{
+    min-height:calc(100dvh - 56px);
+    height:932px;
+    max-height:932px;
+    border-radius:54px;
+    box-shadow: var(--shadow-soft), 0 0 0 10px #05030f, 0 0 0 12px #2a2454;
+  }
+}
+
+#app{position:relative; height:100%; min-height:100dvh;}
+@media (min-width:520px){ #app{ min-height:0; height:100%; } }
+
+/* === ambient starfield === */
+.stars-bg{position:absolute; inset:0; z-index:0; overflow:hidden; pointer-events:none;}
+.star{
+  position:absolute; background:var(--cream); border-radius:50%;
+  opacity:.25; animation: twinkle 3.4s ease-in-out infinite;
+}
+@keyframes twinkle{ 0%,100%{opacity:.15; transform:scale(1);} 50%{opacity:.9; transform:scale(1.25);} }
+
+/* === screens === */
+.screen{
+  position:absolute; inset:0; z-index:1;
+  opacity:0; visibility:hidden; pointer-events:none;
+  transition: opacity .5s ease;
+  display:flex; flex-direction:column;
+}
+.screen.active{ opacity:1; visibility:visible; pointer-events:auto; }
+
+/* === splash === */
+#screen-splash .splash-content{
+  margin:auto; text-align:center; padding: 40px 32px;
+  display:flex; flex-direction:column; align-items:center; gap:18px;
+}
+.eyebrow{
+  letter-spacing:.28em; text-transform:uppercase; font-size:11px;
+  color:var(--rose); font-weight:600; margin:0;
+}
+.script-title{
+  font-family:'Parisienne', cursive; font-size:52px; line-height:1.1;
+  color:var(--gold); margin:0; font-weight:400;
+  text-shadow: 0 0 26px rgba(232,199,126,.35);
+}
+.splash-sub{
+  font-family:'Cormorant Garamond', serif; font-style:italic; font-size:19px;
+  line-height:1.55; color:var(--muted); max-width:320px; margin:0;
+}
+.seal-btn{
+  margin-top:10px; border:none; cursor:pointer;
+  background: radial-gradient(circle at 32% 28%, #c65a76, var(--wine) 60%, var(--wine-dark) 100%);
+  color:var(--cream); font-family:'Poppins',sans-serif; font-weight:500; font-size:15px;
+  padding:16px 30px; border-radius:40px;
+  display:flex; align-items:center; gap:10px;
+  box-shadow: 0 10px 26px rgba(168,57,90,.45), inset 0 1px 0 rgba(255,255,255,.15);
+  transition: transform .2s ease;
+}
+.seal-btn:active{ transform:scale(.96); }
+.seal-icon{ font-size:17px; }
+
+/* === map header === */
+.map-header{
+  position:relative; z-index:2;
+  display:flex; align-items:center; justify-content:space-between;
+  padding: calc(env(safe-area-inset-top,0px) + 18px) 22px 14px;
+  background:linear-gradient(180deg, var(--bg-deep) 55%, rgba(16,12,38,0));
+}
+.brand{ font-family:'Playfair Display',serif; font-weight:600; font-size:17px; letter-spacing:.02em; }
+.score{
+  font-size:13px; font-weight:500; color:var(--gold);
+  background:rgba(232,199,126,.12); border:1px solid rgba(232,199,126,.35);
+  padding:6px 12px; border-radius:20px; display:flex; align-items:center; gap:5px;
+}
+
+.map-scroll{
+  position:relative; flex:1; overflow-y:auto; overflow-x:hidden;
+  padding-bottom:60px;
+  -webkit-overflow-scrolling:touch;
+}
+.map-svg-wrap{ position:relative; }
+#pathSvg{ position:absolute; top:0; left:0; width:100%; height:100%; overflow:visible; }
+
+.node-btn{
+  position:absolute; transform:translate(-50%,-50%);
+  width:74px; height:74px; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:2px;
+  background:none; border:none; cursor:pointer; z-index:2;
+}
+.node-shape{
+  width:58px; height:58px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Playfair Display',serif; font-weight:600; font-size:19px;
+  transition: transform .25s ease;
+  position:relative;
+}
+.node-btn:active .node-shape{ transform:scale(.92); }
+.node-label{
+  font-size:10.5px; color:var(--muted); font-weight:500; text-align:center;
+  max-width:90px; line-height:1.2; margin-top:2px;
+}
+
+.node-locked .node-shape{
+  background:rgba(255,255,255,.05); border:1.5px dashed rgba(161,150,196,.4);
+  color:var(--muted);
+}
+.node-current .node-shape{
+  background: radial-gradient(circle at 32% 28%, #f3dfa2, var(--gold) 65%, var(--gold-dim) 100%);
+  color:#3a2c12; box-shadow:0 0 0 6px rgba(232,199,126,.16), 0 8px 22px rgba(232,199,126,.35);
+  animation: pulse 2.2s ease-in-out infinite;
+}
+@keyframes pulse{ 0%,100%{box-shadow:0 0 0 6px rgba(232,199,126,.16),0 8px 22px rgba(232,199,126,.35);} 50%{box-shadow:0 0 0 12px rgba(232,199,126,.06),0 8px 26px rgba(232,199,126,.5);} }
+.node-done .node-shape{
+  background: radial-gradient(circle at 32% 28%, #ee9cae, var(--rose) 60%, var(--wine) 100%);
+  color:var(--cream); box-shadow:0 6px 18px rgba(226,135,154,.4);
+}
+.node-final .node-shape{ width:70px; height:70px; font-size:26px; }
+.node-final.node-locked .node-shape{ background:rgba(255,255,255,.04); }
+.node-final.node-current .node-shape, .node-final.node-done .node-shape{
+  background: radial-gradient(circle at 32% 28%, #f3dfa2, var(--gold) 60%, var(--wine) 100%);
+  color:#3a2c12;
+}
+
+/* === chapter screen === */
+#screen-chapter{ z-index:5; }
+.back-btn{
+  align-self:flex-start; margin: calc(env(safe-area-inset-top,0px) + 16px) 0 0 20px;
+  background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12);
+  color:var(--ink); font-family:'Poppins',sans-serif; font-size:13px;
+  padding:9px 16px; border-radius:20px; cursor:pointer; z-index:3;
+}
+.chapter-scroll{ flex:1; overflow-y:auto; padding: 14px 0 50px; -webkit-overflow-scrolling:touch; }
+.chapter-head{ padding: 6px 26px 18px; text-align:center; }
+.chapter-eyebrow{ font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:var(--rose); font-weight:600; margin:0 0 6px; }
+.chapter-title{ font-family:'Playfair Display',serif; font-size:26px; font-weight:600; margin:0 0 6px; }
+.chapter-period{ font-size:12.5px; color:var(--muted); margin:0; letter-spacing:.03em; }
+
+.gallery{ display:flex; gap:12px; overflow-x:auto; padding: 4px 22px 10px; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; }
+.gallery::-webkit-scrollbar{ display:none; }
+.gallery-item{
+  flex:0 0 78%; scroll-snap-align:center; border-radius:20px; overflow:hidden;
+  position:relative; aspect-ratio: 4/5; background:var(--panel);
+  box-shadow:0 14px 30px rgba(0,0,0,.35);
+}
+.gallery-item img{ width:100%; height:100%; object-fit:cover; display:block; }
+.gallery-item video{ width:100%; height:100%; object-fit:contain; display:block; background:#000; }
+.gallery-item.is-video{ display:flex; align-items:center; justify-content:center; background:#000; }
+.custom-play{
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+  width:64px; height:64px; border-radius:50%; border:1.5px solid rgba(255,255,255,.95);
+  background:rgba(10,8,24,.55); backdrop-filter:blur(5px);
+  display:flex; align-items:center; justify-content:center;
+  color:#fff; font-size:25px; line-height:1; padding:0; cursor:pointer;
+  z-index:3; box-shadow:0 8px 25px rgba(0,0,0,.35);
+}
+.custom-play::before{ content:'▶'; margin-left:4px; }
+.custom-play:active{ transform:translate(-50%,-50%) scale(.95); }
+.gallery-item.is-video.is-playing .custom-play{ display:none; }
+.gallery-item .video-badge{
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  flex-direction:column; gap:8px; color:var(--muted); background:linear-gradient(160deg,var(--panel),var(--panel-2));
+  font-size:12px; text-align:center; padding:20px;
+}
+.video-badge .play-ic{
+  width:46px; height:46px; border-radius:50%; background:rgba(232,199,126,.15);
+  border:1.5px solid var(--gold); display:flex; align-items:center; justify-content:center; color:var(--gold); font-size:16px;
+}
+.dots{ display:flex; justify-content:center; gap:6px; margin: 2px 0 18px; }
+.dot{ width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.18); }
+.dot.active{ background:var(--gold); }
+
+.memory-note{
+  margin: 4px 22px 22px; padding:18px 20px; border-radius:18px;
+  background:var(--panel); border:1px solid rgba(255,255,255,.06);
+  font-family:'Cormorant Garamond',serif; font-style:italic; font-size:17px; line-height:1.6; color:var(--ink);
+}
+
+.quiz-card{
+  margin: 6px 22px 0; padding:20px; border-radius:20px;
+  background:var(--panel-2); border:1px solid rgba(232,199,126,.18);
+}
+.quiz-label{ font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--gold); font-weight:600; margin:0 0 10px; }
+.quiz-q{ font-size:16px; font-weight:500; margin:0 0 16px; line-height:1.45; }
+.quiz-options{ display:flex; flex-direction:column; gap:10px; }
+.quiz-opt{
+  text-align:left; padding:13px 16px; border-radius:14px; cursor:pointer;
+  background:rgba(255,255,255,.04); border:1.5px solid rgba(255,255,255,.1);
+  color:var(--ink); font-family:'Poppins',sans-serif; font-size:14.5px;
+  transition: all .18s ease;
+}
+.quiz-opt:active{ transform:scale(.98); }
+.quiz-opt.correct{ background:rgba(226,135,154,.18); border-color:var(--rose); color:var(--cream); }
+.quiz-opt.wrong{ background:rgba(168,57,90,.15); border-color:var(--wine); animation: shake .35s ease; }
+.quiz-opt[disabled]{ pointer-events:none; opacity:.55; }
+.quiz-opt.correct[disabled]{ opacity:1; }
+@keyframes shake{ 0%,100%{transform:translateX(0);} 25%{transform:translateX(-6px);} 75%{transform:translateX(6px);} }
+
+.quiz-feedback{ margin-top:14px; font-size:13.5px; color:var(--muted); min-height:18px; }
+.quiz-feedback.success{ color:var(--gold); font-weight:500; }
+
+.chapter-cta{
+  display:block; margin: 22px 22px 0; width:calc(100% - 44px);
+  padding:15px; border:none; border-radius:16px; cursor:pointer;
+  background: linear-gradient(90deg, var(--rose), var(--wine));
+  color:var(--cream); font-family:'Poppins',sans-serif; font-weight:500; font-size:14.5px;
+}
+
+/* === final screen === */
+#screen-final .final-content{
+  margin:auto; text-align:center; padding:40px 30px; display:flex; flex-direction:column; align-items:center; gap:16px;
+}
+.envelope{
+  width:200px; height:140px; position:relative; cursor:pointer; margin-bottom:6px;
+}
+.env-body{
+  position:absolute; inset:0; border-radius:10px;
+  background:linear-gradient(160deg,#f3e9d6,var(--cream));
+  box-shadow:0 18px 40px rgba(0,0,0,.4);
+}
+.env-flap{
+  position:absolute; top:0; left:0; width:100%; height:70%;
+  background:linear-gradient(160deg,#efe1c6,#e7d5b3);
+  clip-path: polygon(0 0, 100% 0, 50% 62%);
+  transform-origin: top center; transition: transform .6s ease;
+  border-radius:10px 10px 0 0;
+}
+.envelope.open .env-flap{ transform: rotateX(180deg); }
+.env-seal{
+  position:absolute; top:52%; left:50%; transform:translate(-50%,-50%);
+  width:44px; height:44px; border-radius:50%; z-index:3;
+  background:radial-gradient(circle at 34% 30%, #c65a76, var(--wine) 65%, var(--wine-dark));
+  display:flex; align-items:center; justify-content:center; color:var(--cream); font-size:17px;
+  box-shadow:0 6px 14px rgba(0,0,0,.35); transition:opacity .3s ease, transform .3s ease;
+}
+.envelope.open .env-seal{ opacity:0; transform:translate(-50%,-50%) scale(.4); }
+
+.letter-paper{
+  display:none; background:var(--cream); color:#3a2c12; border-radius:16px;
+  padding:30px 26px; text-align:left; box-shadow:0 20px 50px rgba(0,0,0,.45);
+  max-height:56vh; overflow-y:auto;
+}
+.envelope.open ~ .letter-paper{ display:block; animation: riseIn .6s ease; }
+@keyframes riseIn{ from{opacity:0; transform:translateY(18px);} to{opacity:1; transform:translateY(0);} }
+.letter-greeting{ font-family:'Playfair Display',serif; font-size:20px; font-weight:600; margin:0 0 14px; }
+.letter-body{ font-family:'Cormorant Garamond',serif; font-style:italic; font-size:18px; line-height:1.75; white-space:pre-line; margin:0; }
+.letter-sign{ font-family:'Parisienne',cursive; font-size:30px; color:var(--wine-dark); margin-top:18px; text-align:right; }
+
+.final-hint{ font-size:13px; color:var(--muted); max-width:280px; line-height:1.5; }
+.final-back{
+  margin-top:6px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15);
+  color:var(--ink); font-size:13px; padding:10px 18px; border-radius:20px; cursor:pointer;
+}
+
+.confetti-layer{ position:fixed; inset:0; pointer-events:none; z-index:50; }
+.confetti-piece{ position:absolute; font-size:16px; animation: fall 1.4s ease-in forwards; }
+@keyframes fall{ 0%{ transform:translateY(-10px) rotate(0deg); opacity:1; } 100%{ transform:translateY(160px) rotate(200deg); opacity:0; } }
+</style>
+</head>
+<body>
+
+<div class="phone-frame">
+  <div id="app">
+    <div class="stars-bg" id="starsBg"></div>
+
+    <!-- SPLASH -->
+    <section id="screen-splash" class="screen active">
+      <div class="splash-content">
+        <p class="eyebrow">Pro Kačenku</p>
+        <h1 class="script-title">Všechno nejlepší k narozeninám</h1>
+        <p class="splash-sub">K tvým 19. narozeninám jsem se pro tebe rozhodl vyrobit takovouhle maličkost ze srdce ajťáka, která odkazuje jen na ty nejkrásnější vzpomínky. Doufám, že se ti to bude líbit a pobaví to, na konci na tebe čeká překvapení. Všechno nejelpší k narozeninám ♡.</p>
+        <button id="btnStart" class="seal-btn">
+          <span class="seal-icon">♡</span>
+          <span>Otevřít mapu</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- MAP -->
+    <section id="screen-map" class="screen">
+      <header class="map-header">
+        <div class="brand">Vzpomínky na Kačenku ♡</div>
+        <div class="score">⭐ <span id="scoreVal">0</span>/<span id="scoreMax">0</span></div>
+      </header>
+      <div class="map-scroll" id="mapScroll">
+        <div class="map-svg-wrap" id="mapSvgWrap">
+          <svg id="pathSvg"></svg>
+          <div id="nodesLayer"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHAPTER -->
+    <section id="screen-chapter" class="screen">
+      <button class="back-btn" id="btnBackToMap">← Mapa</button>
+      <div class="chapter-scroll" id="chapterContent"></div>
+    </section>
+
+    <!-- FINAL -->
+    <section id="screen-final" class="screen">
+      <div class="final-content">
+        <p class="eyebrow">End game♡</p>
+        <div class="envelope" id="envelope">
+          <div class="env-body"></div>
+          <div class="env-flap"></div>
+          <div class="env-seal">♡</div>
+        </div>
+        <div class="letter-paper" id="letterPaper">
+          <p class="letter-greeting" id="letterGreeting">Moje nejdražší Kačenko,</p>
+          <p class="letter-body" id="letterBody"></p>
+          <p class="letter-sign">S láskou, navždy tvůj Tom ♡</p>
+        </div>
+        <p class="final-hint" id="finalHint">Klepni na pečeť a otevři dopis, který na tebe čeká na konci naší cesty.</p>
+        <button class="final-back" id="btnBackFromFinal">← Zpět na mapu</button>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+/* ======================================================================
+   ÚDAJE K DOPLNĚNÍ — LEVELS
+   Toto je zatím DEMO obsah, aby bylo vidět, jak appka funguje (rozvržení).
+   Až mi pošleš pořadí fotek/videí podle období, nahradíme:
+   - title / period / photos / caption u každé kapitoly
+   - otázku, možnosti a správnou odpověď kvízu
+   - text dopisu na konci (LETTER_TEXT)
+   Videa: zatím jsou jen jako "video placeholder" karta v galerii — reálná
+   videa je lepší buď zkomprimovat a vložit, nebo je nahrát/odkázat zvlášť,
+   protože telefonní videa bývají velká.
+   ====================================================================== */
+
+const IMG = {
+  r1: "media/01_1Rande.jpeg",
+  r1v: "media/02_1RandeVol2.jpeg",
+  kytky: "media/03_Kytky.jpeg",
+  kafe: "media/04_Kafe.jpg",
+  moto: "media/05_Motokary.jpeg",
+  pivo: "media/06_Pivo.jpeg",
+  ridicka: "media/08_Dres.jpg",
+  dres: "media/07_Ridicka.jpeg",
+  basket: "media2/10_BasketAutomat.mp4",
+  basketAuto: "media2/09_Basket.mp4",
+  pejsek: "media/11_Pejsek.jpeg",
+  santa: "media/12_Santa.jpeg",
+  ocicka: "media/13_Ocicka.jpg",
+  novyrok: "media/14_NovyRok.jpeg",
+  maturak: "media/15_Maturak.jpg",
+  tanec: "media2/16_Tanec.mp4"
+};
+
+const LEVELS = [
+  {
+    title: "1. Rande",
+    period: "",
+    photos: [
+      {type:"photo", src:IMG.r1},
+      {type:"photo", src:IMG.r1v}
+    ],
+    caption: "Na tenhle večer nikdy nezapomenu, bylo naprosto úžasný sledovat, jak se bavíš a záříš. Hrozně moc ti to slušelo a já jsem byl ten nejpyšnější kluk na světě, když jsem tě sledoval, jak jsi krásna a jak mi nakopáváš prdel ve všem. Bylo to mé nejlepší rande v životě.",
+    quiz: { question: "Kam jsme šli na první rande?", options: ["Motokáry", "Levels", "Kafe"], correct: 1 }
+  },
+  {
+    title: "Radost a úsměv",
+    period: "",
+    photos: [
+      {type:"photo", src:IMG.kytky},
+      {type:"photo", src:IMG.kafe}
+    ],
+    caption: "Jak já miloval/miluju ti dávat kytičky. Nikdy jsem ti je nedával z toho důvodu, že bych musel, nebo že bych se ti potřeboval zalíbit. Vždy jsem to dělal jen proto abych viděl ten tvůj kouzelný úsměv na tváři. Miluju ten pohled na tebe, když tě vidím, jak jsi šťastná a směješ se, to pak totiž činní i mě šťastným. Vždycky když jsem šel pro kytičky, tak mě hrozně bavilo hledat si význam co jaký počet znamená a řešit jaká barva by se ti mohla líbit, ale nic nemělo na ten pocit chůze s kytkou v ruce na veřejnosti, kdy na mě lidi koukali a já měl v hlavě jen jednu krásnou, chytrou a naprosto úžasnou ženu. To jsi byla a vždy budeš ty Kačenko.",
+    quiz: { question: "Kolik růží jsem ti dal poprvý?", options: ["9", "7", "5"], correct: 0 }
+  },
+  {
+    title: "Nejvíc crazy a nejlepší žena na světě",
+    period: "",
+    photos: [
+      {type:"photo", src:IMG.moto},
+      {type:"photo", src:IMG.pivo}
+    ],
+    caption: "Ty můj malý šikovný úžasný Verstappene. Dneska furt vzpomínám na to, jak jsem schválně jel 1 kolo za tebou a sledoval tě a upřímně žasnul jak ti to jde a když jsem tě pak chtěl už předjet, tak jsi mě na poprvý ubránila, jak profík a já jen zíral. Vždycky jsem na tobě miloval jak jsi crazy a že jsem s tebou mohl dělat aktivity, které baví nás oba doufám, že spolu jednou podnikneme něco crazy a na konci toho si budeme moct vychutnat pivečko jako ty právě na fotce(sand to bude radegast).",
+    quiz: { question: "Jaký nejrychlejší čas jsi ten den zajela?", options: ["57.471", "1:01.455", "59.081"], correct: 0 }
+  },
+  {
+    title: "Dva broučci",
+    period: "",
+    photos: [
+      {type:"photo", src:IMG.ridicka},
+      {type:"photo", src:IMG.dres}
+    ],
+    caption: "Musím říct, že ještě nikdy nikomu neslušeli moje 2 oblíbené věci jako tobě. Pamatuju si jak jsem měl malinko strach z toho, jak ti půjčuju auto, ale ty jsi mě během vtěřiny dokázala přesvědčit o opaku. Tolik ti to ten den šlo a já byl na tebe strašně pyšný. Slušelo ti to stejně jako ten můj dres, byl jsem už připravený s basketem skončit loni, ale když jsem viděl jak ten sport máš ráda a jak ti sluší, tak jsem nemohl. Nemohl jsem, protože jsem viděl naprosto překrásnou ženu, kterou jsem vždy obdivoval a vždy budu. Vždycky mě na tobě nejvíc fascinovalo, jak jsi se ničeho nebála a chtěla jsi vše zkusit. Vždycky ti všechno slušelo a i ti vždy bude vše slušet a já na tebe budu vždy pyšný prdelko.",
+    quiz: { question: "Jaké číslo měli mé děravé šortky co jsi vždy nosila?", options: ["31", "13", "26"], correct: 2 }
+  },
+  {
+    title: "Nejlepší basketbalistka",
+    period: "",
+    photos: [
+      {type:"video", src:IMG.basket, note:"Basket"},
+      {type:"video", src:IMG.basketAuto, note:"BasketAutomat"}
+    ],
+    caption: "Nikdy v životě by mě nenapadlo, že budu mít možnost si zahrát můj oblíbený sport s mojí přítelkyní a že jí to tak půjde. Právě to jak ti to šlo a to jak jsi tomu rozuměla, to se mi na tobě vždy strašně moc líbilo. Byl jsem vděčný za každý okamžik, který jsme takhle trávili spolu, vždy jsem si ho moc užil a vždy mě bavilo stát stranou a jen sledovat jak se snažíš a jak ti to jde a hlavně tě tiššě a hrdě obdivovat.",
+    quiz: { question: "Kolik jsi mě porazila celkově v basketu v levels?", options: ["7:5", "4:2", "4:3"], correct: 1 }
+  },
+  {
+    title: "Laskavost",
+    period: "",
+    photos: [
+      {type:"photo", src:IMG.pejsek},
+      {type:"photo", src:IMG.santa}
+    ],
+    caption: "Přesně jak je na té jedné fotce, kde je můj oblíbený santův skřítek, tak přesně tak i já vidím tebe. Vidím tě jako vánočního skřítka, který se snaží rozdávat co nejvíc radosti a štěstí co může, co miluje každé zvířátko a neváhá ani vteřinu nad pomocí cizím lidem či zvířatům. Laskavost, tak se jemnuje tato kapitole, ale to jen proto, protože ty Kačenko patříš mezi ty nejlaskaější osoby na světě, tuhle vlastnost na tobě absolutně miluju stejně jako tebe a vždy ji budu obdivovat.",
+    quiz: { question: "Mé oblbíbené psí plemeno?", options: ["Labrador", "Zlatý retrývr", "Labradorský retrývr"], correct: 2 }
+  },
+  {
+    title: "Životní přání",
+    period: "",
+    photos: [
+      {type:"photo", src:IMG.ocicka},
+      {type:"photo", src:IMG.novyrok}
+    ],
+    caption: "Vždycky jsem si přál abych měl tu možnost slavit nový rok s ženou, kterou miluju a kterou mohu políbit o půlnoci a přát si nějaké přání. Díky tobě se mi to splnilo a já jsem měl tu možnost, trávit několik krásných měsíců s tebou, kdy jsem cítil jen lásku a byl jsem šťastný jak nikdy v životě. Jsem strašně vděčný za tu možnost se zamilovat a hledět do tak krásných očí, které na mě, tak krásně koukala, jako právě teď koukají z fotky na tebe. Jsou to ty nejkrásnější oči na světě a já jsem rád, že aspoň na chvíli jsem měl možnost je milovat a nazývat tě mou přítelkyní.",
+    quiz: { question: "Které muffiny, které jsi upekla na nový rok mi chutnaly víc?", options: ["Oboje", "Světlé", "Tmavé"], correct: 0 }
+  },
+  {
+    title: "Nejkrásnější žena",
+    period: "",
+    photos: [
+      {type:"photo", src:IMG.maturak},
+      {type:"video", src:IMG.tanec, note:"Tanec"}
+    ],
+    caption: "Do dnes vzpomínám na ten večer, jako jeden z nejkrásnějších večerů v životě, pamatuju si ten moment, kdy jsem tě poprvé spatřil a nemohl jsem najít slova, která by popsala tvou krásu. Byl jsem ohromně vděčný za to, že jsem tam mohl být a sledovat tě jak záříš. Nikdo nebyl ten večer krásnější než ty a já jsem byl strašně rád, že jsem měl tu pooctu si zatancovat s takhle krásnou ženou a ještě k tomu na naši oblíbenou písničku, kterou jsme vždy poslouchali v autě. Panatuju si to jako kdyby to bylo včera, neuvěřitelně jsi zářila, měla jsi nejhezčí šaty, vlasy a celkově všechno, nikdo nebyl krásnější a nikdo nebude krásnější než jsi ty. Byla jsi naprosto okouzlující a já se do tebe ještě víc zamiloval lásko.",
+    quiz: { question: "Kdo byl ten večer nejkrásnější?", options: ["Nikdo není krásnější než Kačenka, ani na mě neklikej", "Kačenka ♡", "Správná odpověď je ta nademnou"], correct: 1 }
+  },
+];
+
+const LETTER_TEXT = `Chtěl bych ti ještě jednou popřát vše nejlepší k tvým 19. narozeninám. Hodně štěstí hlavně zdraví, ať se ti daří v nové etapě života na vysoké a ať se hlavně bavíš životem.
+
+Byla to ale krásná cesta že? Užil jsem si každý možný moment co jsem mohl trávit s tebou a kdybych na tom měl něco změnit, tak se jen vrátím a budu si to vše chtít znovu užít s tebou a činit tě ještě víc šťastnou než jsem dělával.
+
+Byla jsi a vždycky budeš má epická láska. Nelituji jediné chvíle co jsem byl s tebou, kdybych měl tu šanci to prožít vše znovu, nebo dát se s tebou znovu dohromady udělám to bezváhání a s radostí. Nikdy jsem nebyl s nikým, tak šťastný jako jsem byl stebou, hrozně moc mě to vše bavilo a miloval jsem momenty, kdy jsem ani nevěřil, že jsme spolu a měl jsem možnost se do tebe zamilovávat ještě víc. Každý naše rande, každou maličkost, každý dárek, každou krásnou chvilku strávenou s tebou, už budu mít navždy v hlavě a nikdy to nebudu chtít vymazat, protože to právě byly ty momenty, kdy jsem byl nejšťastnějsí co jsem kdy byl v životě. Miloval jsem vždy pohled na tebe nebo na fotku, kde jsi měla náhrdelník nebo prstýnek co jsem ti dal, vždy ti to, tak moc slušelo. Ze všeho nejvíc mě ale bavilo psát milostné dopisy, byl to vždy okamžik, kdy jsem na tebe myslel a zapojil celé své srdce a uvědomoval jsem si jak moc vlastně perfektní žena jsi. Jsi ta nejdokonalejší žena, kterou jsem si kdy mohl přát. Není na tobě nic špatně, miluju jak jsi chytrá, vždycky se mi hrozně líbilo jak jdeš do všeho na 100% a strašně moc jsem to obdvivoval a nadále odbidvuju. Miluju jak jsi milá a snažíš se všem pomoct, je to strašně vzácná vlastnost a lidé by si toho měli vážit a být vděčný za tebe jako jsem já. Máš naprosto úžasnou postavu, jsi naprosto perfektní žena a já tě vždycky budu mít jako mou dream ženu.
+
+Chtěl bych říct jen, že jestli tohle má být náš konec, tak jsem rád, že jsei to právě ty, kdo je a byla a navždy bude má epická láska.
+
+Miluju tě a vždy tě budu milovat ♡.
+`;
+
+/* ====================== KONEC ÚDAJŮ K DOPLNĚNÍ ====================== */
+
+const STATE = {
+  points: 0,
+  completed: LEVELS.map(() => false),
+};
+
+const screens = {
+  splash: document.getElementById('screen-splash'),
+  map: document.getElementById('screen-map'),
+  chapter: document.getElementById('screen-chapter'),
+  final: document.getElementById('screen-final'),
+};
+
+function showScreen(name){
+  Object.values(screens).forEach(s => s.classList.remove('active'));
+  screens[name].classList.add('active');
+  if(screens[name].querySelector('.chapter-scroll, .map-scroll')){
+    const sc = screens[name].querySelector('.chapter-scroll, .map-scroll');
+    if(sc) sc.scrollTop = 0;
+  }
+}
+
+/* ---------- starfield ---------- */
+function buildStars(){
+  const layer = document.getElementById('starsBg');
+  const total = 46;
+  const frag = document.createDocumentFragment();
+  for(let i=0;i<total;i++){
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = 1 + Math.random()*2.2;
+    s.style.width = size+'px';
+    s.style.height = size+'px';
+    s.style.top = (Math.random()*100)+'%';
+    s.style.left = (Math.random()*100)+'%';
+    s.style.animationDelay = (Math.random()*3.4)+'s';
+    frag.appendChild(s);
+  }
+  layer.appendChild(frag);
+}
+
+/* ---------- map path + nodes ---------- */
+const SPACING_Y = 220;
+const TOP_PAD = 130;
+const VB_W = 340;
+
+function nodePositions(){
+  const pos = [];
+  for(let i=0;i<LEVELS.length;i++){
+    const y = TOP_PAD + i*SPACING_Y;
+    const x = (i % 2 === 0) ? 108 : 232;
+    pos.push({x,y});
+  }
+  const lastY = pos.length ? pos[pos.length-1].y : TOP_PAD;
+  pos.push({x:170, y:lastY + SPACING_Y*0.9, final:true});
+  return pos;
+}
+
+function pathFromPositions(pos){
+  let d = `M ${pos[0].x},${pos[0].y}`;
+  for(let i=0;i<pos.length-1;i++){
+    const a = pos[i], b = pos[i+1];
+    const c1y = a.y + (b.y-a.y)*0.5;
+    const c2y = b.y - (b.y-a.y)*0.5;
+    d += ` C ${a.x},${c1y} ${b.x},${c2y} ${b.x},${b.y}`;
+  }
+  return d;
+}
+
+function nodeState(i){
+  if(i === LEVELS.length){
+    // final node
+    return STATE.completed.every(Boolean) ? (STATE.finalDone ? 'done':'current') : 'locked';
+  }
+  if(STATE.completed[i]) return 'done';
+  if(i === 0 || STATE.completed[i-1]) return 'current';
+  return 'locked';
+}
+
+function renderMap(){
+  const pos = nodePositions();
+  const svgH = pos[pos.length-1].y + 140;
+  const wrap = document.getElementById('mapSvgWrap');
+  wrap.style.height = svgH + 'px';
+
+  const svg = document.getElementById('pathSvg');
+  svg.setAttribute('viewBox', `0 0 ${VB_W} ${svgH}`);
+  svg.innerHTML = '';
+
+  const d = pathFromPositions(pos);
+
+  const base = document.createElementNS('http://www.w3.org/2000/svg','path');
+  base.setAttribute('d', d);
+  base.setAttribute('fill','none');
+  base.setAttribute('stroke','rgba(161,150,196,0.28)');
+  base.setAttribute('stroke-width','3');
+  base.setAttribute('stroke-dasharray','1 10');
+  base.setAttribute('stroke-linecap','round');
+  svg.appendChild(base);
+
+  const glow = document.createElementNS('http://www.w3.org/2000/svg','path');
+  glow.setAttribute('d', d);
+  glow.setAttribute('fill','none');
+  glow.setAttribute('stroke','url(#goldGrad)');
+  glow.setAttribute('stroke-width','3.4');
+  glow.setAttribute('stroke-linecap','round');
+  glow.setAttribute('id','progressPath');
+  svg.insertAdjacentHTML('afterbegin', `<defs><linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#e8c77e"/><stop offset="100%" stop-color="#e2879a"/>
+  </linearGradient></defs>`);
+  svg.appendChild(glow);
+
+  requestAnimationFrame(() => {
+    const total = glow.getTotalLength();
+    const doneCount = STATE.completed.filter(Boolean).length;
+    const frac = LEVELS.length ? doneCount / LEVELS.length : 0;
+    glow.setAttribute('stroke-dasharray', total);
+    glow.setAttribute('stroke-dashoffset', total * (1-frac));
+    glow.style.transition = 'stroke-dashoffset .6s ease';
+  });
+
+  const nodesLayer = document.getElementById('nodesLayer');
+  nodesLayer.innerHTML = '';
+  nodesLayer.style.position='relative';
+  nodesLayer.style.height = svgH+'px';
+
+  pos.forEach((p, i) => {
+    const isFinal = i === LEVELS.length;
+    const state = nodeState(i);
+    const btn = document.createElement('button');
+    btn.className = `node-btn node-${state}` + (isFinal ? ' node-final' : '');
+    btn.style.left = (p.x/VB_W*100)+'%';
+    btn.style.top = p.y+'px';
+
+    const shape = document.createElement('div');
+    shape.className = 'node-shape';
+    shape.textContent = isFinal ? '✉' : (state==='done' ? '✓' : (i+1));
+    btn.appendChild(shape);
+
+    const label = document.createElement('div');
+    label.className = 'node-label';
+    label.textContent = isFinal ? 'Finále ♡' : LEVELS[i].title.replace(/^Kapitola \d+ — /,'');
+    btn.appendChild(label);
+
+    if(state !== 'locked'){
+      btn.addEventListener('click', () => {
+        if(isFinal){ openFinal(); } else { openChapter(i); }
+      });
+    }
+    nodesLayer.appendChild(btn);
+  });
+
+  document.getElementById('scoreVal').textContent = STATE.points;
+  document.getElementById('scoreMax').textContent = LEVELS.length;
+}
+
+/* ---------- chapter screen ---------- */
+function openChapter(i){
+  const lvl = LEVELS[i];
+  const el = document.getElementById('chapterContent');
+
+  const galleryHtml = lvl.photos.map(ph => {
+    if(ph.type === 'video'){
+      return `<div class="gallery-item is-video">
+        <video src="${ph.src}" playsinline preload="metadata"></video>
+        <button class="custom-play" type="button" aria-label="Přehrát video"></button>
+      </div>`;
+    }
+    return `<div class="gallery-item"><img src="${ph.src}" alt=""></div>`;
+  }).join('');
+
+  const dotsHtml = lvl.photos.map((_,idx) => `<div class="dot${idx===0?' active':''}"></div>`).join('');
+
+  const already = STATE.completed[i];
+  const optionsHtml = lvl.quiz.options.map((opt, idx) => `
+      <button class="quiz-opt" data-idx="${idx}" ${already ? (idx===lvl.quiz.correct ? 'disabled' : 'style="display:none"') : ''}>${opt}</button>
+  `).join('');
+
+  el.innerHTML = `
+    <div class="chapter-head">
+      <p class="chapter-eyebrow">Kapitola ${i+1} z ${LEVELS.length}</p>
+      <h2 class="chapter-title">${lvl.title}</h2>
+      <p class="chapter-period">${lvl.period}</p>
+    </div>
+    <div class="gallery">${galleryHtml}</div>
+    <div class="dots">${dotsHtml}</div>
+    <div class="memory-note">${lvl.caption}</div>
+    <div class="quiz-card">
+      <p class="quiz-label">${already ? 'Zodpovězeno' : 'Malá hádanka'}</p>
+      <p class="quiz-q">${lvl.quiz.question}</p>
+      <div class="quiz-options">${optionsHtml}</div>
+      <p class="quiz-feedback ${already ? 'success' : ''}" id="quizFeedback">${already ? 'Správně! Tuhle hvězdu už máš. ⭐' : ''}</p>
+    </div>
+    ${already ? `<button class="chapter-cta" id="btnChapterDone">Zpět na mapu</button>` : ``}
+  `;
+
+  el.querySelectorAll('.gallery-item.is-video').forEach(card => {
+    const video = card.querySelector('video');
+    const play = card.querySelector('.custom-play');
+    play.addEventListener('click', async () => {
+      try {
+        if (video.paused) {
+          await video.play();
+          card.classList.add('is-playing');
+        } else {
+          video.pause();
+          card.classList.remove('is-playing');
+        }
+      } catch (e) {}
+    });
+    video.addEventListener('pause', () => card.classList.remove('is-playing'));
+    video.addEventListener('ended', () => {
+      card.classList.remove('is-playing');
+      video.currentTime = 0;
+    });
+  });
+
+  const gallery = el.querySelector('.gallery');
+  const dots = el.querySelectorAll('.dot');
+  gallery.addEventListener('scroll', () => {
+    const idx = Math.round(gallery.scrollLeft / gallery.clientWidth);
+    dots.forEach((d,k) => d.classList.toggle('active', k===idx));
+  });
+
+  if(!already){
+    el.querySelectorAll('.quiz-opt').forEach(btn => {
+      btn.addEventListener('click', () => handleAnswer(i, parseInt(btn.dataset.idx), el));
+    });
+  } else {
+    el.querySelector('#btnChapterDone')?.addEventListener('click', () => { renderMap(); showScreen('map'); });
+  }
+
+  showScreen('chapter');
+}
+
+function handleAnswer(levelIndex, idx, container){
+  const lvl = LEVELS[levelIndex];
+  const buttons = container.querySelectorAll('.quiz-opt');
+  const feedback = container.querySelector('#quizFeedback');
+
+  if(idx === lvl.quiz.correct){
+    buttons.forEach(b => b.setAttribute('disabled','true'));
+    buttons[idx].classList.add('correct');
+    feedback.textContent = 'Správně! Získáváš hvězdu. ⭐';
+    feedback.classList.add('success');
+    STATE.completed[levelIndex] = true;
+    STATE.points += 1;
+    burstConfetti();
+    setTimeout(() => {
+      const cta = document.createElement('button');
+      cta.className = 'chapter-cta';
+      cta.textContent = 'Zpět na mapu';
+      cta.addEventListener('click', () => { renderMap(); showScreen('map'); });
+      container.appendChild(cta);
+    }, 300);
+  } else {
+    buttons[idx].classList.add('wrong');
+    feedback.textContent = 'Ještě to není ono, zkus to znovu.';
+    setTimeout(() => buttons[idx].classList.remove('wrong'), 400);
+  }
+}
+
+/* ---------- final screen ---------- */
+function openFinal(){
+  document.getElementById('letterBody').textContent = LETTER_TEXT;
+  const env = document.getElementById('envelope');
+  env.classList.remove('open');
+  document.getElementById('finalHint').style.display='block';
+  showScreen('final');
+}
+
+document.getElementById('envelope').addEventListener('click', function(){
+  this.classList.add('open');
+  document.getElementById('finalHint').style.display='none';
+  STATE.finalDone = true;
+});
+
+/* ---------- confetti ---------- */
+function burstConfetti(){
+  const layer = document.createElement('div');
+  layer.className = 'confetti-layer';
+  document.body.appendChild(layer);
+  const glyphs = ['⭐','✦','♡'];
+  for(let i=0;i<16;i++){
+    const p = document.createElement('div');
+    p.className = 'confetti-piece';
+    p.textContent = glyphs[Math.floor(Math.random()*glyphs.length)];
+    p.style.left = (10+Math.random()*80)+'%';
+    p.style.top = (30+Math.random()*20)+'%';
+    p.style.animationDelay = (Math.random()*0.2)+'s';
+    p.style.color = Math.random() > .5 ? '#e8c77e' : '#e2879a';
+    layer.appendChild(p);
+  }
+  setTimeout(() => layer.remove(), 1600);
+}
+
+/* ---------- nav wiring ---------- */
+document.getElementById('btnStart').addEventListener('click', () => { renderMap(); showScreen('map'); });
+document.getElementById('btnBackToMap').addEventListener('click', () => { renderMap(); showScreen('map'); });
+document.getElementById('btnBackFromFinal').addEventListener('click', () => { renderMap(); showScreen('map'); });
+
+buildStars();
+renderMap();
+</script>
+</body>
+</html>
